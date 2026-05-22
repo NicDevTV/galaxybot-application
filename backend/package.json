@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "NicDevTV",
   "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "echo \"No tests configured\""
+  },
   "dependencies": {
+    "@fastify/cors": "^11.1.0",
     "fastify": "^5.8.5",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1",
@@ -17,6 +21,10 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "tsx": "^4.20.5",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "uuid": "^11.1.0"
   }
 }
