@@ -6,12 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": "NicDevTV",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "fastify": "^5.8.5",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

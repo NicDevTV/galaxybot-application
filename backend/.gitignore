@@ -22,10 +22,6 @@ pnpm-debug.log*
 .DS_Store
 *.swp
 
-# Lockfiles (if using pnpm, keep pnpm-lock.yaml if desired)
-package-lock.json
-yarn.lock
-
 # Coverage
 coverage/
 
