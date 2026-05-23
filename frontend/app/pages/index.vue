@@ -57,13 +57,8 @@
             <div class="grid min-h-[calc(100vh-12rem)] gap-6 p-6 xl:items-stretch xl:grid-cols-[minmax(0,1.1fr)_4px_minmax(0,0.9fr)]">
               <div class="flex flex-col gap-4">
                 <div class="flex justify-end">
-                  <UButton
-                    icon="i-lucide-plus"
-                    color="success"
-                    variant="outline"
-                    @click="addSlideoverOpen = true"
-                  >
-                    Hinzufügen
+                  <UButton icon="i-lucide-plus" color="success" variant="outline" @click="addSlideoverOpen = true">
+                    Komponente hinzufügen
                   </UButton>
                 </div>
 
@@ -75,13 +70,20 @@
                   <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
                         <div class="font-semibold">
-                          {{ component.type === 'hero' ? 'Hero' : 'Jobs' }}<span class="text-error"> *</span>
+                          {{ component.type === 'hero' ? 'Hero' : component.type === 'jobs' ? 'Jobs' : 'Socials' }}
+                          <span v-if="component.type === 'hero' || component.type === 'jobs'" class="text-error"> *</span>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <UButton icon="i-lucide-arrow-up" color="primary" variant="outline" :disabled="index === 0" @click="moveComponent(index, index - 1)" />
-                        <UButton icon="i-lucide-arrow-down" color="primary" variant="outline" :disabled="index === components.length - 1" @click="moveComponent(index, index + 1)" />
-                        <UButton icon="i-lucide-trash-2" color="error" variant="outline" disabled />
+                      <UButton icon="i-lucide-arrow-up" color="primary" variant="outline" :disabled="index === 0" @click="moveComponent(index, index - 1)" />
+                      <UButton icon="i-lucide-arrow-down" color="primary" variant="outline" :disabled="index === components.length - 1" @click="moveComponent(index, index + 1)" />
+                      <UButton
+                        icon="i-lucide-trash-2"
+                        color="error"
+                        variant="outline"
+                        :disabled="component.type === 'hero' || component.type === 'jobs'"
+                        @click="removeComponent(index)"
+                      />
                     </div>
                   </div>
 
@@ -116,7 +118,7 @@
                       </UFormField>
                     </div>
                   </template>
-                  <template v-else>
+                  <template v-else-if="component.type === 'jobs'">
                     <div class="grid gap-3 md:grid-cols-2">
                       <UFormField label="Title" name="jobsTitle">
                         <UInput
@@ -141,26 +143,63 @@
                       </UFormField>
                     </div>
                   </template>
-                </div>
+                  <template v-else>
+                    <div class="space-y-4">
+                      <div class="grid gap-3 md:grid-cols-2">
+                        <UFormField label="Title" name="socialsTitle">
+                          <UInput v-model="socialsTitle" placeholder="Socials" :maxlength="30" />
+                        </UFormField>
+                        <UFormField label="Description" name="socialsDescription">
+                          <UTextarea v-model="socialsDescription" :rows="3" placeholder="Folge uns auf unseren Plattformen." :maxlength="100" />
+                        </UFormField>
+                      </div>
 
-                <div
-                  v-for="(component, index) in extraComponents"
-                  :key="component.type"
-                  class="rounded-2xl border border-muted/30 bg-default p-4"
-                >
-                  <div class="mb-4 flex items-center justify-between gap-3">
-                    <div>
-                      <div class="font-semibold">{{ component.title }}</div>
-                      <div class="text-sm text-muted">Optional component</div>
-                    </div>
-                    <div class="flex gap-2">
-                      <UButton icon="i-lucide-arrow-up" color="primary" variant="outline" :disabled="index === 0" @click="moveExtraComponent(index, index - 1)" />
-                      <UButton icon="i-lucide-arrow-down" color="primary" variant="outline" :disabled="index === extraComponents.length - 1" @click="moveExtraComponent(index, index + 1)" />
-                      <UButton icon="i-lucide-trash-2" color="error" variant="outline" @click="removeExtraComponent(index)" />
-                    </div>
-                  </div>
+                      <div class="space-y-3">
+                        <div class="rounded-2xl border border-muted/30 bg-muted/10 p-4">
+                          <div class="mb-4 flex items-center justify-between gap-3">
+                            <div class="font-semibold">Socials</div>
+                          </div>
 
-                  <p class="text-sm text-muted">Später kommen hier noch Einstellungen dazu.</p>
+                          <div class="space-y-3">
+                            <div
+                              v-for="(social, socialIndex) in socialEntries"
+                              :key="social.id"
+                              class="rounded-xl border border-muted/20 bg-default p-3"
+                            >
+                              <div class="mb-3 flex items-center justify-between gap-3">
+                                <div class="font-medium capitalize">{{ social.platform }}</div>
+                                <div class="flex items-center gap-2">
+                                  <UButton icon="i-lucide-arrow-up" size="xs" color="neutral" variant="ghost" :disabled="socialIndex === 0" @click="moveSocialEntry(socialIndex, socialIndex - 1)" />
+                                  <UButton icon="i-lucide-arrow-down" size="xs" color="neutral" variant="ghost" :disabled="socialIndex === socialEntries.length - 1" @click="moveSocialEntry(socialIndex, socialIndex + 1)" />
+                                  <UButton icon="i-lucide-trash-2" size="xs" color="error" variant="ghost" @click="removeSocialEntry(socialIndex)" />
+                                </div>
+                              </div>
+
+                              <UFormField label="Link" :name="`socialHandle-${social.id}`">
+                                <div class="flex overflow-hidden rounded-lg border border-muted/30">
+                                  <span class="flex items-center border-r border-muted/30 bg-muted/20 px-3 text-xs text-muted whitespace-nowrap">
+                                    https://youtube.com/@
+                                  </span>
+                                  <UInput v-model="social.handle" class="flex-1 rounded-none border-0" placeholder="galaxybot" :maxlength="60" />
+                                </div>
+                              </UFormField>
+                            </div>
+
+                            <UDropdownMenu :items="availableSocialEntries" :ui="{ content: 'min-w-52' }">
+                              <button
+                                type="button"
+                                :disabled="!hasAvailableSocialEntries"
+                                class="flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-muted/35 px-4 py-5 text-sm text-muted transition hover:border-primary/60 hover:text-primary disabled:cursor-not-allowed disabled:border-muted/20 disabled:text-muted/40"
+                              >
+                                <UIcon name="i-lucide-plus" class="h-5 w-5" />
+                                Social hinzufügen
+                              </button>
+                            </UDropdownMenu>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
                 </div>
               </div>
 
@@ -169,67 +208,7 @@
               <div class="hidden xl:block">
                 <div class="sticky top-6 h-full rounded-2xl border border-muted/30 bg-default p-6">
                   <p class="text-sm uppercase tracking-widest text-muted">Application Page Preview</p>
-                  <div class="relative mt-6 overflow-hidden border-b border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-14" :class="heroBannerUrl ? 'text-white' : ''">
-                    <div v-if="heroBannerUrl" class="absolute inset-0">
-                      <img :src="heroBannerUrl" alt="Hero banner preview" class="h-full w-full object-cover" />
-                      <div class="absolute inset-0 bg-black/45" />
-                    </div>
-                    <div class="relative z-10 flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                      <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Application</p>
-                        <h1 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                          {{ heroTitle }}
-                        </h1>
-                      </div>
-                      <p class="max-w-2xl text-base leading-7 sm:text-right" :class="heroBannerUrl ? 'text-white/85' : 'text-muted'">
-                        {{ heroDescription }}
-                      </p>
-                    </div>
-                  </div>
-                  <section class="mt-8 space-y-8">
-                    <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                      <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Jobs</p>
-                        <h2 class="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-                          {{ jobsTitle }}
-                        </h2>
-                      </div>
-                      <p class="max-w-3xl text-base leading-7 text-muted sm:text-lg lg:text-right">
-                        {{ jobsDescription }}
-                      </p>
-                    </div>
-                    <div class="grid gap-0 border-t border-muted/20 md:grid-cols-2">
-                      <div class="border-b border-muted/20 px-0 py-8 md:border-b-0 md:border-r md:px-6 lg:px-8">
-                        <div class="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 class="text-lg font-semibold tracking-tight">Supporter m/w/d</h3>
-                            <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-                              Du unterstützt das Team im Alltag und sorgst für einen reibungslosen Ablauf.
-                            </p>
-                          </div>
-                          <UBadge color="success" variant="soft">Geöffnet</UBadge>
-                        </div>
-                        <p class="mt-6 max-w-xl text-sm leading-6 text-muted">
-                          Perfekt für motivierte Leute, die gerne helfen und Verantwortung übernehmen.
-                        </p>
-                      </div>
-
-                      <div class="px-0 py-8 md:px-6 lg:px-8">
-                        <div class="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 class="text-lg font-semibold tracking-tight">Helfer m/w/d</h3>
-                            <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-                              Du packst mit an, unterstützt Projekte und hältst dem Team den Rücken frei.
-                            </p>
-                          </div>
-                          <UBadge color="neutral" variant="soft">Geschlossen</UBadge>
-                        </div>
-                        <p class="mt-6 max-w-xl text-sm leading-6 text-muted">
-                          Ein einfacher Einstieg mit klaren Aufgaben und direktem Teamkontakt.
-                        </p>
-                      </div>
-                    </div>
-                  </section>
+                  <ApplicationPagePreview class="mt-6" :components="previewComponents" />
                 </div>
               </div>
             </div>
@@ -248,19 +227,20 @@
             </div>
           </template>
         </UModal>
+
+        <USlideover v-model:open="addSlideoverOpen" title="Komponente hinzufügen">
+          <template #body>
+            <div class="rounded-2xl border border-muted/30 bg-default p-4">
+              <div class="font-medium">Socials</div>
+              <div class="mt-1 text-sm text-muted">Füge das Socials-Component mit YouTube, TikTok und Discord hinzu.</div>
+              <UButton class="mt-4" color="success" icon="i-lucide-plus" @click="addSocialComponent">
+                Hinzufügen
+              </UButton>
+            </div>
+          </template>
+        </USlideover>
       </UCard>
     </div>
-
-    <USlideover v-model:open="addSlideoverOpen" title="Component hinzufügen">
-      <template #body>
-        <div class="grid gap-3">
-          <div v-for="item in availableComponents" :key="item.type" class="rounded-2xl border border-dashed border-muted/40 px-4 py-3">
-            <div class="font-medium">{{ item.title }}</div>
-            <div class="mt-1 text-sm text-muted">{{ item.description }}</div>
-          </div>
-        </div>
-      </template>
-    </USlideover>
 
     <UModal v-model:open="isLeaveConfirmOpen" title="Verlassen ohne speichern?">
       <template #body>
@@ -282,6 +262,15 @@ import { z } from 'zod'
 type PageComponent =
   | { type: 'hero'; title: string; description: string; bannerUrl: string }
   | { type: 'jobs'; title: string; description: string }
+  | { type: 'socials'; title: string; description: string; socials: Array<{ platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }> }
+
+const socialPlatformItems = [
+  { label: 'YouTube', value: 'youtube' },
+  { label: 'Instagram', value: 'instagram' },
+  { label: 'TikTok', value: 'tiktok' },
+  { label: 'Discord', value: 'discord' },
+  { label: 'Email', value: 'email' },
+] as const
 
 const apiBase = 'http://127.0.0.1:3001'
 const isModalOpen = ref(false)
@@ -298,17 +287,28 @@ const heroDescription = ref('Build your next application with a clean, modern la
 const heroBannerUrl = ref('')
 const jobsTitle = ref('Jobs')
 const jobsDescription = ref('Find your next role in our open positions.')
+const socialsTitle = ref('Socials')
+const socialsDescription = ref('Folge uns auf YouTube.')
+const socialEntries = ref<Array<{ id: string; platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }>>([
+  { id: 'social-1', platform: 'youtube', handle: 'galaxybot', visible: true },
+  { id: 'social-2', platform: 'tiktok', handle: 'galaxybot', visible: true },
+  { id: 'social-3', platform: 'discord', handle: 'discord.gg/galaxybot', visible: true }
+])
 const components = ref<PageComponent[]>([
   { type: 'hero', title: 'Hero', description: 'Build your next application with a clean, modern landing page.', bannerUrl: '' },
-  { type: 'jobs', title: 'Jobs', description: 'Find your next role in our open positions.' }
+  { type: 'jobs', title: 'Jobs', description: 'Find your next role in our open positions.' },
+  {
+    type: 'socials',
+    title: 'Socials',
+    description: 'Folge uns auf YouTube.',
+    socials: [
+      { platform: 'youtube', handle: 'galaxybot', visible: true },
+      { platform: 'tiktok', handle: 'galaxybot', visible: true },
+      { platform: 'discord', handle: 'discord.gg/galaxybot', visible: true }
+    ]
+  }
 ])
-const extraComponents = ref<Array<{ type: string; title: string }>>([])
 const savedSnapshot = ref('')
-const availableComponents = [
-  { type: 'available', title: 'Bald', description: '' },
-  { type: 'available', title: 'Verfügbar', description: '' }
-]
-
 const pageSchema = z.object({
   components: z.array(z.discriminatedUnion('type', [
     z.object({
@@ -321,8 +321,63 @@ const pageSchema = z.object({
       type: z.literal('jobs'),
       title: z.string().trim().min(1).max(30),
       description: z.string().trim().min(1).max(100)
+    }),
+    z.object({
+      type: z.literal('socials'),
+      title: z.string().trim().min(1).max(30),
+      description: z.string().trim().min(1).max(100),
+      socials: z.array(z.object({
+        platform: z.enum(['youtube', 'instagram', 'tiktok', 'discord', 'email']),
+        handle: z.string().trim().min(1).max(60),
+        visible: z.boolean()
+      })).min(1).max(12).superRefine((socials, ctx) => {
+        const seen = new Set<string>()
+        for (const [index, social] of socials.entries()) {
+          if (seen.has(social.platform)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [index, 'platform'],
+              message: 'Platform darf nur einmal vorkommen.'
+            })
+          }
+          seen.add(social.platform)
+        }
+      })
     })
   ])).min(2)
+})
+
+const availableSocialEntries = computed(() => {
+  const usedPlatforms = new Set(socialEntries.value.map(entry => entry.platform))
+  return socialPlatformItems
+    .filter(item => !usedPlatforms.has(item.value))
+    .map(item => ({
+      label: item.label,
+      icon: item.value === 'youtube'
+        ? 'i-simple-icons-youtube'
+        : item.value === 'instagram'
+          ? 'i-simple-icons-instagram'
+          : item.value === 'tiktok'
+            ? 'i-simple-icons-tiktok'
+            : item.value === 'discord'
+              ? 'i-simple-icons-discord'
+              : item.value === 'email'
+                ? 'i-lucide-mail'
+                : 'i-lucide-globe',
+      onSelect: () => addSocialEntry(item.value)
+    }))
+})
+
+const hasAvailableSocialEntries = computed(() => availableSocialEntries.value.length > 0)
+
+const previewComponents = computed<PageComponent[]>(() => {
+  return components.value.map(component => ({
+    ...component,
+    title: component.type === 'hero' ? heroTitle.value : component.type === 'jobs' ? jobsTitle.value : socialsTitle.value,
+    description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : socialsDescription.value,
+    ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {}),
+    ...(component.type === 'socials' ? { socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible })) } : {})
+  })) as PageComponent[]
 })
 
 function openModal() {
@@ -335,6 +390,75 @@ function openModal() {
       isSaved.value = false
       isModalOpen.value = true
     })
+}
+
+function removeComponent(index: number) {
+  const component = components.value[index]
+  if (!component || component.type === 'hero' || component.type === 'jobs') {
+    return
+  }
+
+  components.value.splice(index, 1)
+}
+
+function addSocialComponent() {
+  if (components.value.some(component => component.type === 'socials')) {
+    return
+  }
+
+  components.value.push({
+    type: 'socials',
+    title: socialsTitle.value,
+    description: socialsDescription.value,
+    socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible }))
+  })
+  addSlideoverOpen.value = false
+}
+
+function addSocialEntry(platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email') {
+  if (socialEntries.value.some(entry => entry.platform === platform)) {
+    return
+  }
+
+  const defaults: Record<typeof platform, string> = {
+    youtube: 'galaxybot',
+    instagram: 'galaxybot',
+    tiktok: 'galaxybot',
+    discord: 'discord.gg/galaxybot',
+    email: 'hello@galaxybot.com'
+  }
+
+  socialEntries.value = [
+    ...socialEntries.value,
+    {
+      id: `social-${crypto.randomUUID()}`,
+      platform,
+      handle: defaults[platform],
+      visible: true
+    }
+  ]
+}
+
+function removeSocialEntry(index: number) {
+  if (socialEntries.value.length <= 1) {
+    return
+  }
+
+  socialEntries.value.splice(index, 1)
+}
+
+function moveSocialEntry(fromIndex: number, toIndex: number) {
+  if (toIndex < 0 || toIndex >= socialEntries.value.length) {
+    return
+  }
+
+  const next = [...socialEntries.value]
+  const [moved] = next.splice(fromIndex, 1)
+  if (!moved) {
+    return
+  }
+  next.splice(toIndex, 0, moved)
+  socialEntries.value = next
 }
 
 function getApplyUrl() {
@@ -396,24 +520,6 @@ function moveComponent(fromIndex: number, toIndex: number) {
   components.value = next
 }
 
-function moveExtraComponent(fromIndex: number, toIndex: number) {
-  if (toIndex < 0 || toIndex >= extraComponents.value.length) {
-    return
-  }
-
-  const next = [...extraComponents.value]
-  const [moved] = next.splice(fromIndex, 1)
-  if (!moved) {
-    return
-  }
-  next.splice(toIndex, 0, moved)
-  extraComponents.value = next
-}
-
-function removeExtraComponent(index: number) {
-  extraComponents.value.splice(index, 1)
-}
-
 async function loadPage() {
   try {
     const data = await $fetch<{ components: PageComponent[] }>(`${apiBase}/api/application-settings`)
@@ -421,18 +527,34 @@ async function loadPage() {
     components.value = parsed.components
     const hero = parsed.components.find(component => component.type === 'hero')
     const jobs = parsed.components.find(component => component.type === 'jobs')
+    const socials = parsed.components.find(component => component.type === 'socials')
     heroTitle.value = hero?.title || 'Hero'
     heroDescription.value = hero?.description || ''
     heroBannerUrl.value = hero?.bannerUrl || ''
     jobsTitle.value = jobs?.title || 'Jobs'
     jobsDescription.value = jobs?.description || ''
+    socialsTitle.value = socials?.title || 'Socials'
+    socialsDescription.value = socials?.description || 'Folge uns auf YouTube.'
+    socialEntries.value = socials?.socials.map((social, index) => ({
+      id: `social-${index + 1}`,
+      platform: social.platform,
+      handle: social.handle,
+      visible: social.visible
+    })) ?? [
+      { id: 'social-1', platform: 'youtube', handle: 'galaxybot', visible: true },
+      { id: 'social-2', platform: 'tiktok', handle: 'galaxybot', visible: true },
+      { id: 'social-3', platform: 'discord', handle: 'discord.gg/galaxybot', visible: true }
+    ]
     savedSnapshot.value = JSON.stringify({
       components: parsed.components,
       heroTitle: heroTitle.value,
       heroDescription: heroDescription.value,
       heroBannerUrl: heroBannerUrl.value,
       jobsTitle: jobsTitle.value,
-      jobsDescription: jobsDescription.value
+      jobsDescription: jobsDescription.value,
+      socialsTitle: socialsTitle.value,
+      socialsDescription: socialsDescription.value,
+      socialEntries: socialEntries.value
     })
     // This is the value for the unsaved-changes check.
     hasUnsavedChanges.value = false
@@ -453,9 +575,10 @@ async function savePage() {
     const payload = {
       components: components.value.map(component => ({
         ...component,
-        title: component.type === 'hero' ? heroTitle.value : jobsTitle.value,
-        description: component.type === 'hero' ? heroDescription.value : jobsDescription.value,
-        ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {})
+        title: component.type === 'hero' ? heroTitle.value : component.type === 'jobs' ? jobsTitle.value : socialsTitle.value,
+        description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : socialsDescription.value,
+        ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {}),
+        ...(component.type === 'socials' ? { socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible })) } : {})
       }))
     }
 
@@ -473,7 +596,10 @@ async function savePage() {
       heroDescription: heroDescription.value,
       heroBannerUrl: heroBannerUrl.value,
       jobsTitle: jobsTitle.value,
-      jobsDescription: jobsDescription.value
+      jobsDescription: jobsDescription.value,
+      socialsTitle: socialsTitle.value,
+      socialsDescription: socialsDescription.value,
+      socialEntries: socialEntries.value
     })
     isModalOpen.value = false
     toast.add({
@@ -506,7 +632,7 @@ function discardAndClose() {
 }
 
 watch(
-  [components, heroTitle, heroDescription, heroBannerUrl, jobsTitle, jobsDescription],
+  [components, heroTitle, heroDescription, heroBannerUrl, jobsTitle, jobsDescription, socialsTitle, socialsDescription, socialEntries],
   () => {
     // Compare the current form with the last saved snapshot.
     hasUnsavedChanges.value = JSON.stringify({
@@ -515,7 +641,10 @@ watch(
       heroDescription: heroDescription.value,
       heroBannerUrl: heroBannerUrl.value,
       jobsTitle: jobsTitle.value,
-      jobsDescription: jobsDescription.value
+      jobsDescription: jobsDescription.value,
+      socialsTitle: socialsTitle.value,
+      socialsDescription: socialsDescription.value,
+      socialEntries: socialEntries.value
     }) !== savedSnapshot.value
   },
   { deep: true }
