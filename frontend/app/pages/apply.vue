@@ -1,44 +1,49 @@
 <template>
   <div class="min-h-screen bg-default text-default">
-    <UHeader title="Application" />
+    <UHeader title="Applications" />
 
     <main class="flex w-full flex-col">
       <section
         v-for="component in components"
         :key="component.type"
-        class="w-full border-b border-muted/20 px-4 py-10 sm:px-6 lg:px-8"
+        class="w-full border-b border-muted/20"
       >
         <div
           v-if="component.type === 'hero'"
-          class="relative overflow-hidden px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
+          class="relative min-h-[20rem] overflow-hidden px-4 py-8 pb-12 sm:px-6 sm:pb-14 lg:px-8 lg:py-10 lg:pb-16"
           :class="component.bannerUrl ? 'text-white' : ''"
         >
           <div v-if="component.bannerUrl" class="absolute inset-0">
             <img :src="component.bannerUrl" alt="Header banner" class="h-full w-full object-cover" />
-            <div class="absolute inset-0 bg-black/45" />
+            <div class="absolute inset-0 bg-black/55" />
           </div>
-          <div class="relative z-10 flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Application</p>
-              <h1 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {{ component.title }}
-              </h1>
+          <div class="relative z-10 flex min-h-[20rem] w-full items-center">
+            <div class="flex w-full flex-col gap-4 py-2 sm:py-4 lg:flex-row lg:items-end lg:justify-between">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Application</p>
+                <h1 class="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-4xl">
+                  {{ component.title }}
+                </h1>
+              </div>
+              <p
+                class="max-w-2xl text-base leading-7 sm:text-lg lg:text-right"
+                :class="component.bannerUrl ? 'text-white/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]' : 'text-muted'"
+              >
+                {{ component.description }}
+              </p>
             </div>
-            <p class="max-w-2xl text-base leading-7 sm:text-right" :class="component.bannerUrl ? 'text-white/85' : 'text-muted'">
-              {{ component.description }}
-            </p>
           </div>
         </div>
 
-        <div v-else class="space-y-8">
+        <div v-else class="space-y-8 border-t border-muted/20 px-4 pt-10 sm:px-6 lg:px-8 lg:pt-12">
           <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Jobs</p>
-              <h2 class="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+              <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Jobs</p>
+              <h2 class="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
                 {{ component.title }}
               </h2>
             </div>
-            <p class="max-w-3xl text-base leading-7 text-muted sm:text-lg lg:text-right">
+            <p class="max-w-2xl text-base leading-7 text-muted sm:text-lg lg:text-right">
               {{ component.description }}
             </p>
           </div>
