@@ -33,7 +33,7 @@
                 {{ isLinkCopied ? 'Kopiert' : 'Link kopieren' }}
               </UButton>
               <UButton icon="i-lucide-share-2" color="neutral" variant="outline" @click="shareApplyLink">
-                Share
+                Link teilen
               </UButton>
             </div>
           </div>
@@ -290,6 +290,7 @@ const isLeaveConfirmOpen = ref(false)
 const isSaved = ref(false)
 const hasUnsavedChanges = ref(false)
 const isLinkCopied = ref(false)
+const toast = useToast()
 // Small timer to flip the copy button back after a short success state.
 let copyResetTimer: ReturnType<typeof setTimeout> | undefined
 const heroTitle = ref('Hero')
@@ -326,10 +327,14 @@ const pageSchema = z.object({
 
 function openModal() {
   // Always load fresh data before the editor opens.
-  void loadPage().finally(() => {
-    isSaved.value = false
-    isModalOpen.value = true
-  })
+  void loadPage()
+    .then((success) => {
+      if (!success) {
+        return
+      }
+      isSaved.value = false
+      isModalOpen.value = true
+    })
 }
 
 function getApplyUrl() {
@@ -337,29 +342,38 @@ function getApplyUrl() {
 }
 
 async function copyApplyLink() {
-  if (copyResetTimer) {
-    clearTimeout(copyResetTimer)
-  }
+  try {
+    if (copyResetTimer) {
+      clearTimeout(copyResetTimer)
+    }
 
-  await navigator.clipboard.writeText(getApplyUrl())
-  isLinkCopied.value = true
-  // Reset the button so it does not stay green forever.
-  copyResetTimer = setTimeout(() => {
-    isLinkCopied.value = false
-  }, 2000)
+    await navigator.clipboard.writeText(getApplyUrl())
+    isLinkCopied.value = true
+    toast.add({
+      title: 'Link kopiert',
+      description: 'Die Bewerbungsseite liegt jetzt in deiner Zwischenablage.',
+      icon: 'i-lucide-copy-check',
+      color: 'success'
+    })
+    // Reset the button so it does not stay green forever.
+    copyResetTimer = setTimeout(() => {
+      isLinkCopied.value = false
+    }, 2000)
+  } catch {
+    toast.add({
+      title: 'Link konnte nicht kopiert werden',
+      description: 'Bitte versuche es erneut.',
+      icon: 'i-lucide-circle-alert',
+      color: 'error'
+    })
+  }
 }
 
 async function shareApplyLink() {
-  const url = getApplyUrl()
-  if (navigator.share) {
-    await navigator.share({
-      title: 'Bewerbungsportal',
-      url
-    })
-    return
-  }
-
-  await navigator.clipboard.writeText(url)
+  await navigator.share({
+    title: 'Bewerbungsportal',
+    url: getApplyUrl()
+  })
 }
 
 onBeforeUnmount(() => {
@@ -400,8 +414,9 @@ function removeExtraComponent(index: number) {
   extraComponents.value.splice(index, 1)
 }
 
-function loadPage() {
-  return $fetch<{ components: PageComponent[] }>(`${apiBase}/api/application-settings`).then((data) => {
+async function loadPage() {
+  try {
+    const data = await $fetch<{ components: PageComponent[] }>(`${apiBase}/api/application-settings`)
     const parsed = pageSchema.parse(data)
     components.value = parsed.components
     const hero = parsed.components.find(component => component.type === 'hero')
@@ -421,36 +436,60 @@ function loadPage() {
     })
     // This is the value for the unsaved-changes check.
     hasUnsavedChanges.value = false
-  })
+    return true
+  } catch {
+    toast.add({
+      title: 'Bewerbungsseite konnte nicht geladen werden',
+      description: 'Bitte versuche es erneut.',
+      icon: 'i-lucide-circle-alert',
+      color: 'error'
+    })
+    return false
+  }
 }
 
 async function savePage() {
-  const payload = {
-    components: components.value.map(component => ({
-      ...component,
-      title: component.type === 'hero' ? heroTitle.value : jobsTitle.value,
-      description: component.type === 'hero' ? heroDescription.value : jobsDescription.value,
-      ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {})
-    }))
+  try {
+    const payload = {
+      components: components.value.map(component => ({
+        ...component,
+        title: component.type === 'hero' ? heroTitle.value : jobsTitle.value,
+        description: component.type === 'hero' ? heroDescription.value : jobsDescription.value,
+        ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {})
+      }))
+    }
+
+    const parsed = pageSchema.parse(payload)
+    await $fetch(`${apiBase}/api/application-settings`, {
+      method: 'PUT',
+      body: parsed
+    })
+
+    isSaved.value = true
+    hasUnsavedChanges.value = false
+    savedSnapshot.value = JSON.stringify({
+      components: parsed.components,
+      heroTitle: heroTitle.value,
+      heroDescription: heroDescription.value,
+      heroBannerUrl: heroBannerUrl.value,
+      jobsTitle: jobsTitle.value,
+      jobsDescription: jobsDescription.value
+    })
+    isModalOpen.value = false
+    toast.add({
+      title: 'Gespeichert',
+      description: 'Die Bewerbungsseite wurde erfolgreich aktualisiert.',
+      icon: 'i-lucide-check-circle-2',
+      color: 'success'
+    })
+  } catch {
+    toast.add({
+      title: 'Speichern fehlgeschlagen',
+      description: 'Bitte prüfe deine Eingaben und versuche es erneut.',
+      icon: 'i-lucide-circle-alert',
+      color: 'error'
+    })
   }
-
-  const parsed = pageSchema.parse(payload)
-  await $fetch(`${apiBase}/api/application-settings`, {
-    method: 'PUT',
-    body: parsed
-  })
-
-  isSaved.value = true
-  hasUnsavedChanges.value = false
-  savedSnapshot.value = JSON.stringify({
-    components: parsed.components,
-    heroTitle: heroTitle.value,
-    heroDescription: heroDescription.value,
-    heroBannerUrl: heroBannerUrl.value,
-    jobsTitle: jobsTitle.value,
-    jobsDescription: jobsDescription.value
-  })
-  isModalOpen.value = false
 }
 
 function openLeaveConfirm() {
