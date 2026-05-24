@@ -17,7 +17,7 @@
         <div class="relative z-10 flex min-h-[20rem] w-full items-center">
           <div class="flex w-full flex-col gap-4 py-2 sm:py-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="min-w-0 flex-1">
-              <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Application</p>
+              <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Applications</p>
               <h1 class="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-4xl">
                 {{ component.title }}
               </h1>
@@ -48,13 +48,13 @@
               <div>
                 <h3 class="text-lg font-semibold tracking-tight">Supporter m/w/d</h3>
                 <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-                  Du unterstützt das Team im Alltag und sorgst für einen reibungslosen Ablauf.
+                  Hier sollen die User dann halt ihre Ausschreibungen haben 1
                 </p>
               </div>
               <UBadge color="success" variant="soft">Geöffnet</UBadge>
             </div>
             <p class="mt-6 max-w-xl text-sm leading-6 text-muted">
-              Perfekt für motivierte Leute, die gerne helfen und Verantwortung übernehmen.
+              Hier sollen die User dann halt ihre Ausschreibungen haben 2
             </p>
           </div>
 
@@ -63,13 +63,13 @@
               <div>
                 <h3 class="text-lg font-semibold tracking-tight">Helfer m/w/d</h3>
                 <p class="mt-3 max-w-xl text-sm leading-6 text-muted">
-                  Du packst mit an, unterstützt Projekte und hältst dem Team den Rücken frei.
+                  Hier sollen die User dann halt ihre Ausschreibungen haben 1
                 </p>
               </div>
               <UBadge color="neutral" variant="soft">Geschlossen</UBadge>
             </div>
             <p class="mt-6 max-w-xl text-sm leading-6 text-muted">
-              Ein einfacher Einstieg mit klaren Aufgaben und direktem Teamkontakt.
+              Hier sollen die User dann halt ihre Ausschreibungen haben 2
             </p>
           </div>
         </div>

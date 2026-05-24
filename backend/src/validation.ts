@@ -93,7 +93,6 @@ export const pageComponentSchema = z.discriminatedUnion('type', [
 ])
 
 export const pageSettingsSchema = z.object({
-  // The app currently only persists the two required blocks.
   components: z.array(pageComponentSchema).min(2)
 }).superRefine((page, ctx) => {
   const seenTypes = new Set<string>()

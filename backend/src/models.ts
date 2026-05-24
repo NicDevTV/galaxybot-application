@@ -23,15 +23,15 @@ ApplicationSettings.init({
 })
 
 export async function ensureDefaultApplicationSettings() {
-  // Seed one default record so the frontend always has something to load.
+  // Set one default configuration
   await ApplicationSettings.findOrCreate({
     where: { id: 1 },
     defaults: {
       id: 1,
       pageSettings: JSON.stringify({
         components: [
-          { type: 'hero', title: 'Hero', description: 'Build your next application with a clean, modern landing page.', bannerUrl: '' },
-          { type: 'jobs', title: 'Jobs', description: 'Find your next role in our open positions.' }
+          { type: 'hero', title: 'Unsere Möglichkeiten', description: 'Bewirb dich heute für ein Team der Zukunft!', bannerUrl: 'https://cdn.eso.org/images/screen/eso1019a.jpg' },
+          { type: 'jobs', title: 'Unsere Jobs', description: 'Finde die Position, die am besten zu dir passt.' }
         ]
       })
     }

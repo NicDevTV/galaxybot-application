@@ -10,14 +10,14 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold">Page components</h1>
+            <h1 class="text-2xl font-bold">Die Components, für die /apply Seite</h1>
           </div>
         </template>
 
         <div class="mb-6 rounded-2xl border border-muted/30 bg-default p-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Application</p>
+              <p class="text-sm font-medium uppercase tracking-[0.3em] text-primary">Application Page</p>
               <h2 class="mt-2 text-lg font-semibold">Bewerbungsseite öffnen</h2>
             </div>
             <div class="flex flex-wrap gap-2">
