@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div v-else class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      <div v-else-if="component.type === 'socials'" class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div class="min-w-0 flex-1">
             <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Socials</p>
@@ -106,6 +106,38 @@
           </a>
         </UMarquee>
       </div>
+      <div v-else class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+        <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Images</p>
+            <h2 class="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+              {{ component.title }}
+            </h2>
+          </div>
+          <p class="max-w-2xl text-base leading-7 text-muted sm:text-lg lg:text-right">
+            {{ component.description }}
+          </p>
+        </div>
+
+        <UCarousel
+          v-slot="{ item }"
+          :items="component.images"
+          :ui="{
+            item: component.carousel.itemsPerPage === 1 ? 'basis-full px-2' : component.carousel.itemsPerPage === 2 ? 'basis-full md:basis-1/2 px-2' : 'basis-full md:basis-1/2 lg:basis-1/3 px-2',
+            container: 'items-stretch',
+            prev: 'left-6 md:left-8 z-20 h-10 w-10 inline-flex items-center justify-center rounded-full bg-default/95 ring-1 ring-muted/40 shadow-sm',
+            next: 'right-6 md:right-8 z-20 h-10 w-10 inline-flex items-center justify-center rounded-full bg-default/95 ring-1 ring-muted/40 shadow-sm'
+          }"
+          :arrows="component.carousel.showArrows"
+          :dots="component.carousel.showDots"
+          :autoplay="component.carousel.autoplay ? { delay: 3000 } : false"
+          class="w-full"
+        >
+          <div class="overflow-hidden rounded-xl border border-muted/20">
+            <img :src="item.imageUrl" alt="Application image" class="h-56 w-full object-cover" />
+          </div>
+        </UCarousel>
+      </div>
     </section>
   </div>
 </template>
@@ -115,6 +147,7 @@ type PageComponent =
   | { type: 'hero'; title: string; description: string; bannerUrl: string }
   | { type: 'jobs'; title: string; description: string }
   | { type: 'socials'; title: string; description: string; socials: Array<{ platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }> }
+  | { type: 'images'; title: string; description: string; images: Array<{ imageUrl: string }>; carousel: { itemsPerPage: number; showArrows: boolean; showDots: boolean; autoplay: boolean } }
 
 defineProps<{
   components: PageComponent[]

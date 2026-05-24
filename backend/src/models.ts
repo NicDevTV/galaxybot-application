@@ -31,17 +31,7 @@ export async function ensureDefaultApplicationSettings() {
       pageSettings: JSON.stringify({
         components: [
           { type: 'hero', title: 'Hero', description: 'Build your next application with a clean, modern landing page.', bannerUrl: '' },
-          { type: 'jobs', title: 'Jobs', description: 'Find your next role in our open positions.' },
-          {
-            type: 'socials',
-            title: 'Socials',
-            description: 'Folge uns auf unseren Plattformen.',
-            socials: [
-              { platform: 'youtube', handle: 'galaxybot', visible: true },
-              { platform: 'tiktok', handle: 'galaxybot', visible: true },
-              { platform: 'discord', handle: 'discord.gg/galaxybot', visible: true }
-            ]
-          }
+          { type: 'jobs', title: 'Jobs', description: 'Find your next role in our open positions.' }
         ]
       })
     }

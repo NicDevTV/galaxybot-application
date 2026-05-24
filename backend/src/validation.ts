@@ -49,6 +49,25 @@ export const pageComponentSchema = z.discriminatedUnion('type', [
         seen.add(social.platform)
       }
     })
+  }),
+  z.object({
+    type: z.literal('images'),
+    title: z.string().trim().min(1).max(30),
+    description: z.string().trim().min(1).max(100),
+    images: z.array(z.object({
+      imageUrl: z.string().trim().url().max(100)
+    })).min(1).max(10),
+    carousel: z.object({
+      itemsPerPage: z.number().int().min(1).max(3).default(3),
+      showArrows: z.boolean().default(true),
+      showDots: z.boolean().default(true),
+      autoplay: z.boolean().default(false)
+    }).default({
+      itemsPerPage: 3,
+      showArrows: true,
+      showDots: true,
+      autoplay: false
+    })
   })
 ])
 
