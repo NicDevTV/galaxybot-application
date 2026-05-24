@@ -36,11 +36,35 @@ export const pageComponentSchema = z.discriminatedUnion('type', [
       platform: z.enum(['youtube', 'instagram', 'tiktok', 'discord', 'email']),
       handle: z.string().trim().min(1).max(60),
       visible: z.boolean()
-    })).min(1).max(12)
+    })).min(1).max(12).superRefine((socials, ctx) => {
+      const seen = new Set<string>()
+      for (const [index, social] of socials.entries()) {
+        if (seen.has(social.platform)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [index, 'platform'],
+            message: 'Platform darf nur einmal vorkommen.'
+          })
+        }
+        seen.add(social.platform)
+      }
+    })
   })
 ])
 
 export const pageSettingsSchema = z.object({
   // The app currently only persists the two required blocks.
   components: z.array(pageComponentSchema).min(2)
+}).superRefine((page, ctx) => {
+  const seenTypes = new Set<string>()
+  for (const [index, component] of page.components.entries()) {
+    if (seenTypes.has(component.type)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['components', index, 'type'],
+        message: 'Component-Typ darf nur einmal vorkommen.'
+      })
+    }
+    seenTypes.add(component.type)
+  }
 })
