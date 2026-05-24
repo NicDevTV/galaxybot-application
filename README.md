@@ -8,7 +8,7 @@
 ### Frontend Dependencies
 - `nuxt` - Framework fürs Frontend.
 - `nuxt-ui` - UI-Komponente
-- `vue` - UI-Basis43454
+- `vue` - UI-Basis
 - `zod` - Validierung der Eingaben(Frontend)
 
 ### Backend Dependencies
