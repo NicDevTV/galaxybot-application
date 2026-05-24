@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-default text-default">
     <UHeader title="Applications" />
-    <ApplicationPagePreview :components="components" />
+    <ApplicationPageRenderer :components="components" />
   </div>
 </template>
 

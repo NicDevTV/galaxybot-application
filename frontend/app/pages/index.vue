@@ -208,7 +208,7 @@
               <div class="hidden xl:block">
                 <div class="sticky top-6 h-full rounded-2xl border border-muted/30 bg-default p-6">
                   <p class="text-sm uppercase tracking-widest text-muted">Application Page Preview</p>
-                  <ApplicationPagePreview class="mt-6" :components="previewComponents" />
+                  <ApplicationPageRenderer class="mt-6" :components="previewComponents" />
                 </div>
               </div>
             </div>
