@@ -230,12 +230,24 @@
 
         <USlideover v-model:open="addSlideoverOpen" title="Komponente hinzufügen">
           <template #body>
-            <div class="rounded-2xl border border-muted/30 bg-default p-4">
-              <div class="font-medium">Socials</div>
-              <div class="mt-1 text-sm text-muted">Füge das Socials-Component mit YouTube, TikTok und Discord hinzu.</div>
-              <UButton class="mt-4" color="success" icon="i-lucide-plus" @click="addSocialComponent">
-                Hinzufügen
-              </UButton>
+            <div class="space-y-4">
+              <div
+                v-for="item in addableComponentItems"
+                :key="item.type"
+                class="rounded-2xl border border-muted/30 bg-default p-4"
+              >
+                <div class="font-medium">{{ item.title }}</div>
+                <div class="mt-1 text-sm text-muted">{{ item.description }}</div>
+                <UButton
+                  class="mt-4"
+                  color="success"
+                  icon="i-lucide-plus"
+                  :disabled="item.disabled"
+                  @click="addComponentByType(item.type)"
+                >
+                  Hinzufügen
+                </UButton>
+              </div>
             </div>
           </template>
         </USlideover>
@@ -369,6 +381,17 @@ const availableSocialEntries = computed(() => {
 })
 
 const hasAvailableSocialEntries = computed(() => availableSocialEntries.value.length > 0)
+const addableComponentItems = computed(() => {
+  const usedTypes = new Set(components.value.map(component => component.type))
+  return [
+    {
+      type: 'socials' as const,
+      title: 'Socials',
+      description: 'Social-Links wie YouTube, TikTok oder Discord.',
+      disabled: usedTypes.has('socials')
+    }
+  ].sort((a, b) => Number(a.disabled) - Number(b.disabled))
+})
 
 const previewComponents = computed<PageComponent[]>(() => {
   return components.value.map(component => ({
@@ -413,6 +436,35 @@ function addSocialComponent() {
     socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible }))
   })
   addSlideoverOpen.value = false
+}
+
+function addComponentByType(type: 'hero' | 'jobs' | 'socials') {
+  if (components.value.some(component => component.type === type)) {
+    return
+  }
+
+  if (type === 'hero') {
+    components.value.push({
+      type: 'hero',
+      title: heroTitle.value,
+      description: heroDescription.value,
+      bannerUrl: heroBannerUrl.value
+    })
+    addSlideoverOpen.value = false
+    return
+  }
+
+  if (type === 'jobs') {
+    components.value.push({
+      type: 'jobs',
+      title: jobsTitle.value,
+      description: jobsDescription.value
+    })
+    addSlideoverOpen.value = false
+    return
+  }
+
+  addSocialComponent()
 }
 
 function addSocialEntry(platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email') {

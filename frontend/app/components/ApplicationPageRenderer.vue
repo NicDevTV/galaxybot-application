@@ -88,24 +88,22 @@
           </p>
         </div>
 
-        <UMarquee :speed="18" pause-on-hover class="overflow-hidden">
-          <div class="flex min-w-full items-center justify-evenly gap-8 px-8 pr-8">
-            <template v-for="social in component.socials" :key="social.platform">
-              <a
-                v-if="social.visible"
-                :href="social.platform === 'youtube' ? `https://youtube.com/@${social.handle}` : social.platform === 'instagram' ? `https://www.instagram.com/${social.handle}` : social.platform === 'tiktok' ? `https://www.tiktok.com/@${social.handle}` : social.platform === 'discord' ? `https://discord.gg/${social.handle}` : `mailto:${social.handle}`"
-                target="_blank"
-                rel="noreferrer"
-                class="inline-flex h-16 w-16 flex-none items-center justify-center text-muted transition hover:text-primary"
-                :aria-label="social.platform"
-              >
-                <UIcon
-                  :name="social.platform === 'youtube' ? 'i-simple-icons-youtube' : social.platform === 'instagram' ? 'i-simple-icons-instagram' : social.platform === 'tiktok' ? 'i-simple-icons-tiktok' : social.platform === 'discord' ? 'i-simple-icons-discord' : 'i-lucide-mail'"
-                  class="h-8 w-8"
-                />
-              </a>
-            </template>
-          </div>
+        <UMarquee :speed="18" :repeat="4" pause-on-hover class="overflow-hidden">
+          <a
+            v-for="social in component.socials"
+            v-show="social.visible"
+            :key="social.platform"
+            :href="social.platform === 'youtube' ? `https://youtube.com/@${social.handle}` : social.platform === 'instagram' ? `https://www.instagram.com/${social.handle}` : social.platform === 'tiktok' ? `https://www.tiktok.com/@${social.handle}` : social.platform === 'discord' ? `https://discord.gg/${social.handle}` : `mailto:${social.handle}`"
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex h-16 w-16 shrink-0 items-center justify-center text-muted transition hover:text-primary"
+            :aria-label="social.platform"
+          >
+            <UIcon
+              :name="social.platform === 'youtube' ? 'i-simple-icons-youtube' : social.platform === 'instagram' ? 'i-simple-icons-instagram' : social.platform === 'tiktok' ? 'i-simple-icons-tiktok' : social.platform === 'discord' ? 'i-simple-icons-discord' : 'i-lucide-mail'"
+              class="h-8 w-8"
+            />
+          </a>
         </UMarquee>
       </div>
     </section>
