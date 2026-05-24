@@ -76,7 +76,7 @@ export const pageComponentSchema = z.discriminatedUnion('type', [
     columns: z.number().int().min(2).max(4),
     rows: z.number().int().min(1).max(3),
     items: z.array(z.object({
-      icon: z.string().trim().min(1),
+      icon: z.string().trim().min(1).max(50),
       head: z.string().trim().min(1).max(60),
       body: z.string().trim().min(1).max(160)
     })).max(12)

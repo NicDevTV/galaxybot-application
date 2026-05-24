@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-default text-default">
-    <UHeader title="Application Customizer">
+    <UHeader title="Application Page Customizer">
       <template #right>
         <UBadge color="primary">Demo</UBadge>
       </template>
@@ -54,7 +54,7 @@
           </template>
 
           <template #body>
-            <div class="grid min-h-[calc(100vh-12rem)] gap-6 p-6 xl:items-stretch xl:grid-cols-[minmax(0,1.1fr)_4px_minmax(0,0.9fr)]">
+            <div class="min-h-[calc(100vh-12rem)] p-6">
               <div class="flex flex-col gap-4">
                 <div class="flex justify-end">
                   <UButton icon="i-lucide-plus" color="success" variant="outline" @click="addSlideoverOpen = true">
@@ -105,7 +105,7 @@
                         </UInput>
                       </UFormField>
                       <UFormField label="Description" name="heroDescription">
-                        <UTextarea v-model="heroDescription" :rows="3" placeholder="Hero description" :maxlength="100" />
+                        <UTextarea v-model="heroDescription" :rows="2" placeholder="Hero description" :maxlength="100" />
                         <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                           {{ heroDescription.length }}/100
                         </div>
@@ -136,7 +136,7 @@
                         </UInput>
                       </UFormField>
                       <UFormField label="Description" name="jobsDescription">
-                        <UTextarea v-model="jobsDescription" :rows="3" placeholder="Jobs description" :maxlength="100" />
+                        <UTextarea v-model="jobsDescription" :rows="2" placeholder="Jobs description" :maxlength="100" />
                         <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                           {{ jobsDescription.length }}/100
                         </div>
@@ -162,14 +162,14 @@
                           </UInput>
                         </UFormField>
                         <UFormField label="Description" name="socialsDescription">
-                          <UTextarea v-model="socialsDescription" :rows="3" placeholder="Folge uns auf unseren Plattformen." :maxlength="100" />
+                          <UTextarea v-model="socialsDescription" :rows="2" placeholder="Folge uns auf unseren Plattformen." :maxlength="100" />
                           <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                             {{ socialsDescription.length }}/100
                           </div>
                         </UFormField>
                       </div>
 
-                      <div class="space-y-3">
+                      <div class="grid gap-3 xl:grid-cols-2">
                         <div class="rounded-2xl border border-muted/30 bg-muted/10 p-4">
                           <div class="mb-4 flex items-center justify-between gap-3">
                             <div class="font-semibold">Socials</div>
@@ -179,7 +179,7 @@
                             <div
                               v-for="(social, socialIndex) in socialEntries"
                               :key="social.id"
-                              class="rounded-xl border border-muted/20 bg-default p-3"
+                              class="rounded-xl border border-muted/20 bg-default p-3 space-y-3"
                             >
                               <div class="mb-3 flex items-center justify-between gap-3">
                                 <div class="font-medium capitalize">{{ social.platform }}</div>
@@ -190,27 +190,34 @@
                                 </div>
                               </div>
 
-                              <UFormField label="Link" :name="`socialHandle-${social.id}`">
-                                <div class="flex overflow-hidden rounded-lg border border-muted/30">
-                                  <span class="flex items-center border-r border-muted/30 bg-muted/20 px-3 text-xs text-muted whitespace-nowrap">
-                                    {{
-                                      social.platform === 'youtube'
-                                        ? 'https://youtube.com/@'
-                                        : social.platform === 'instagram'
-                                          ? 'https://instagram.com/'
-                                          : social.platform === 'tiktok'
-                                            ? 'https://tiktok.com/@'
-                                            : social.platform === 'discord'
-                                              ? 'https://discord.gg/'
-                                              : 'mailto:'
-                                    }}
-                                  </span>
-                                  <UInput v-model="social.handle" class="flex-1 rounded-none border-0" placeholder="galaxybot" :maxlength="60" />
-                                </div>
-                                <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
-                                  {{ social.handle.length }}/60
-                                </div>
-                              </UFormField>
+                              <div class="grid gap-3 md:grid-cols-2">
+                                <UFormField label="Link" :name="`socialHandle-${social.id}`">
+                                  <div class="flex overflow-hidden rounded-lg border border-muted/30">
+                                    <span class="flex items-center border-r border-muted/30 bg-muted/20 px-3 text-xs text-muted whitespace-nowrap">
+                                      {{
+                                        social.platform === 'youtube'
+                                          ? 'https://youtube.com/@'
+                                          : social.platform === 'instagram'
+                                            ? 'https://instagram.com/'
+                                            : social.platform === 'tiktok'
+                                              ? 'https://tiktok.com/@'
+                                              : social.platform === 'discord'
+                                                ? 'https://discord.gg/'
+                                                : 'mailto:'
+                                      }}
+                                    </span>
+                                    <UInput v-model="social.handle" class="flex-1 rounded-none border-0" placeholder="galaxybot" :maxlength="60" />
+                                  </div>
+                                  <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                                    {{ social.handle.length }}/60
+                                  </div>
+                                </UFormField>
+                                <UFormField label="Sichtbar">
+                                  <div class="flex h-9 items-center">
+                                    <USwitch v-model="social.visible" />
+                                  </div>
+                                </UFormField>
+                              </div>
                             </div>
 
                             <UDropdownMenu :items="availableSocialEntries" :ui="{ content: 'min-w-52' }">
@@ -248,7 +255,7 @@
                           </UInput>
                         </UFormField>
                         <UFormField label="Description" name="imagesDescription">
-                          <UTextarea v-model="imagesDescription" :rows="3" placeholder="Ein paar Eindrücke aus dem Team." :maxlength="100" />
+                          <UTextarea v-model="imagesDescription" :rows="2" placeholder="Ein paar Eindrücke aus dem Team." :maxlength="100" />
                           <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                             {{ imagesDescription.length }}/100
                           </div>
@@ -268,7 +275,7 @@
                         <UFormField label="Autoplay" name="imageAutoplay"><USwitch v-model="imageAutoplay" /></UFormField>
                       </div>
                       </div>
-                      <div class="space-y-3">
+                      <div class="grid gap-3 xl:grid-cols-2">
                         <UButton icon="i-lucide-plus" :disabled="imageEntries.length >= 10" @click="addImageEntry">Bild hinzufügen</UButton>
                         <div v-for="(image, imageIndex) in imageEntries" :key="image.id" class="rounded-xl border border-muted/20 bg-default p-3 space-y-3">
                           <div class="flex justify-end"><UButton icon="i-lucide-trash-2" size="xs" color="error" variant="ghost" @click="removeImageEntry(imageIndex)" /></div>
@@ -301,7 +308,7 @@
                             </UInput>
                           </UFormField>
                           <UFormField label="Description" name="gridDescription">
-                            <UTextarea v-model="gridDescription" :rows="3" :maxlength="100" />
+                            <UTextarea v-model="gridDescription" :rows="2" :maxlength="100" />
                             <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                               {{ gridDescription.length }}/100
                             </div>
@@ -323,7 +330,7 @@
                           class="rounded-xl border border-muted/20 bg-default p-3 space-y-3"
                         >
                           <div class="text-xs font-medium uppercase tracking-wide text-muted">Item {{ itemIndex + 1 }}</div>
-                          <div class="grid gap-3 md:grid-cols-2">
+                          <div class="grid gap-3 lg:grid-cols-3">
                             <UFormField label="Icon">
                               <UInputMenu
                                 v-model="item.icon"
@@ -346,13 +353,13 @@
                                 </template>
                               </UInput>
                             </UFormField>
+                            <UFormField label="Body">
+                              <UTextarea v-model="item.body" :rows="2" :maxlength="160" />
+                              <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                                {{ item.body.length }}/160
+                              </div>
+                            </UFormField>
                           </div>
-                          <UFormField label="Body">
-                            <UTextarea v-model="item.body" :rows="2" :maxlength="160" />
-                            <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
-                              {{ item.body.length }}/160
-                            </div>
-                          </UFormField>
                         </div>
                       </div>
                     </div>
@@ -360,14 +367,6 @@
                 </div>
               </div>
 
-              <div class="hidden min-h-full self-stretch bg-border/80 xl:block" />
-
-              <div class="hidden xl:block">
-                <div class="sticky top-6 h-full rounded-2xl border border-muted/30 bg-default p-6">
-                  <p class="text-sm uppercase tracking-widest text-muted">Application Page Preview</p>
-                  <ApplicationPageRenderer class="mt-6" :components="previewComponents" />
-                </div>
-              </div>
             </div>
           </template>
 
@@ -465,7 +464,6 @@ const isSaved = ref(false)
 const hasUnsavedChanges = ref(false)
 const isLinkCopied = ref(false)
 const toast = useToast()
-// Small timer to flip the copy button back after a short success state.
 let copyResetTimer: ReturnType<typeof setTimeout> | undefined
 const heroTitle = ref('')
 const heroDescription = ref('')
@@ -562,7 +560,7 @@ const pageSchema = z.object({
       columns: z.number().int().min(2).max(4),
       rows: z.number().int().min(1).max(3),
       items: z.array(z.object({
-        icon: z.string().trim().min(1),
+        icon: z.string().trim().min(1).max(120),
         head: z.string().trim().min(1).max(60),
         body: z.string().trim().min(1).max(160)
       })).max(12)
@@ -612,32 +610,20 @@ const addableComponentItems = computed(() => {
     {
       type: 'images' as const,
       title: 'Images',
-      description: 'Bild-Carousel mit optionalen Ziel-Links.',
+      description: 'Bild-Carousel mit verschiedenen Möglichkeiten, zur Darstellung von Bildern.',
       disabled: usedTypes.has('images')
     },
     {
       type: 'grid' as const,
       title: 'Grid',
-      description: 'Mehrspaltiges Inhaltsraster.',
+      description: 'Mehrspaltiges Raster halt.',
       disabled: usedTypes.has('grid')
     }
   ].sort((a, b) => Number(a.disabled) - Number(b.disabled))
 })
 
-const previewComponents = computed<PageComponent[]>(() => {
-  return components.value.map(component => ({
-    ...component,
-    title: component.type === 'hero' ? heroTitle.value : component.type === 'jobs' ? jobsTitle.value : component.type === 'socials' ? socialsTitle.value : component.type === 'images' ? imagesTitle.value : gridTitle.value,
-    description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : component.type === 'socials' ? socialsDescription.value : component.type === 'images' ? imagesDescription.value : gridDescription.value,
-    ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {}),
-    ...(component.type === 'socials' ? { socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible })) } : {}),
-    ...(component.type === 'images' ? { title: imagesTitle.value, description: imagesDescription.value, images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })), carousel: { itemsPerPage: imageItemsPerPage.value, showArrows: imageShowArrows.value, showDots: imageShowDots.value, autoplay: imageAutoplay.value } } : {}),
-    ...(component.type === 'grid' ? { title: gridTitle.value, description: gridDescription.value, columns: gridColumns.value, rows: gridRows.value, items: gridItems.value.map(({ icon, head, body }) => ({ icon, head, body })) } : {})
-  })) as PageComponent[]
-})
-
 function openModal() {
-  // Always load fresh data before the editor opens.
+  // Always load data before opening the editor
   void loadPage()
     .then((success) => {
       if (!success) {
@@ -826,7 +812,7 @@ async function copyApplyLink() {
       icon: 'i-lucide-copy-check',
       color: 'success'
     })
-    // Reset the button so it does not stay green forever.
+    // Reset the button
     copyResetTimer = setTimeout(() => {
       isLinkCopied.value = false
     }, 2000)
