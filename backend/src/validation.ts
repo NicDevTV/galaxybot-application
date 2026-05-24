@@ -68,6 +68,27 @@ export const pageComponentSchema = z.discriminatedUnion('type', [
       showDots: true,
       autoplay: false
     })
+  }),
+  z.object({
+    type: z.literal('grid'),
+    title: z.string().trim().min(1).max(30),
+    description: z.string().trim().min(1).max(100),
+    columns: z.number().int().min(2).max(4),
+    rows: z.number().int().min(1).max(3),
+    items: z.array(z.object({
+      icon: z.string().trim().min(1),
+      head: z.string().trim().min(1).max(60),
+      body: z.string().trim().min(1).max(160)
+    })).max(12)
+  }).superRefine((grid, ctx) => {
+    const expected = grid.columns * grid.rows
+    if (grid.items.length !== expected) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['items'],
+        message: `Grid items must match columns*rows (${expected}).`
+      })
+    }
   })
 ])
 

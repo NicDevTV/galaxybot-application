@@ -106,7 +106,7 @@
           </a>
         </UMarquee>
       </div>
-      <div v-else class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+      <div v-else-if="component.type === 'images'" class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div class="min-w-0 flex-1">
             <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Images</p>
@@ -138,6 +138,37 @@
           </div>
         </UCarousel>
       </div>
+      <div v-else class="space-y-6 border-t border-muted/20 px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
+        <div class="flex w-full flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-medium uppercase tracking-[0.35em] text-primary/90">Grid</p>
+            <h2 class="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+              {{ component.title }}
+            </h2>
+          </div>
+          <p class="max-w-2xl text-base leading-7 text-muted sm:text-lg lg:text-right">
+            {{ component.description }}
+          </p>
+        </div>
+        <div
+          class="grid gap-4"
+          :class="component.columns === 2 ? 'md:grid-cols-2' : component.columns === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'"
+        >
+          <div
+            v-for="(item, itemIndex) in component.items"
+            :key="itemIndex"
+            class="rounded-xl border border-muted/20 bg-muted/10 p-4 text-sm leading-6 text-default"
+          >
+            <div class="flex items-start gap-3">
+              <UIcon :name="item.icon" class="mt-0.5 h-5 w-5 text-primary" />
+              <div>
+                <p class="font-medium">{{ item.head }}</p>
+                <p class="mt-1 text-sm text-muted">{{ item.body }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
@@ -148,6 +179,7 @@ type PageComponent =
   | { type: 'jobs'; title: string; description: string }
   | { type: 'socials'; title: string; description: string; socials: Array<{ platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }> }
   | { type: 'images'; title: string; description: string; images: Array<{ imageUrl: string }>; carousel: { itemsPerPage: number; showArrows: boolean; showDots: boolean; autoplay: boolean } }
+  | { type: 'grid'; title: string; description: string; columns: number; rows: number; items: Array<{ icon: string; head: string; body: string }> }
 
 defineProps<{
   components: PageComponent[]

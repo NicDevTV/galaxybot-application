@@ -70,7 +70,7 @@
                   <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
                         <div class="font-semibold">
-                          {{ component.type === 'hero' ? 'Hero' : component.type === 'jobs' ? 'Jobs' : component.type === 'socials' ? 'Socials' : 'Images' }}
+                          {{ component.type === 'hero' ? 'Hero' : component.type === 'jobs' ? 'Jobs' : component.type === 'socials' ? 'Socials' : component.type === 'images' ? 'Images' : 'Grid' }}
                           <span v-if="component.type === 'hero' || component.type === 'jobs'" class="text-error"> *</span>
                         </div>
                     </div>
@@ -228,7 +228,7 @@
                       </div>
                     </div>
                   </template>
-                  <template v-else>
+                  <template v-else-if="component.type === 'images'">
                     <div class="space-y-4">
                       <div class="rounded-2xl border border-muted/30 bg-muted/10 p-4 space-y-4">
                         <div class="grid gap-3 md:grid-cols-2">
@@ -276,6 +276,81 @@
                             <UInput v-model="image.imageUrl" placeholder="https://..." :maxlength="100" />
                             <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
                               {{ image.imageUrl.length }}/100
+                            </div>
+                          </UFormField>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="space-y-4">
+                      <div class="rounded-2xl border border-muted/30 bg-muted/10 p-4 space-y-4">
+                        <div class="grid gap-3 md:grid-cols-2">
+                          <UFormField label="Title" name="gridTitle">
+                            <UInput
+                              v-model="gridTitle"
+                              :maxlength="30"
+                              aria-describedby="grid-title-count"
+                              :ui="{ trailing: 'pointer-events-none' }"
+                            >
+                              <template #trailing>
+                                <div id="grid-title-count" class="text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                                  {{ gridTitle.length }}/30
+                                </div>
+                              </template>
+                            </UInput>
+                          </UFormField>
+                          <UFormField label="Description" name="gridDescription">
+                            <UTextarea v-model="gridDescription" :rows="3" :maxlength="100" />
+                            <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                              {{ gridDescription.length }}/100
+                            </div>
+                          </UFormField>
+                        </div>
+                        <div class="grid gap-3 md:grid-cols-2">
+                          <UFormField label="Spalten" name="gridColumns">
+                            <UInputNumber v-model="gridColumns" :min="2" :max="4" />
+                          </UFormField>
+                          <UFormField label="Reihen" name="gridRows">
+                            <UInputNumber v-model="gridRows" :min="1" :max="3" />
+                          </UFormField>
+                        </div>
+                      </div>
+                      <div class="space-y-3">
+                        <div
+                          v-for="(item, itemIndex) in gridItems"
+                          :key="item.id"
+                          class="rounded-xl border border-muted/20 bg-default p-3 space-y-3"
+                        >
+                          <div class="text-xs font-medium uppercase tracking-wide text-muted">Item {{ itemIndex + 1 }}</div>
+                          <div class="grid gap-3 md:grid-cols-2">
+                            <UFormField label="Icon">
+                              <UInputMenu
+                                v-model="item.icon"
+                                :items="gridIconSuggestions"
+                                placeholder="i-lucide-star"
+                                :search-input="{ placeholder: 'Icon suchen...' }"
+                              />
+                            </UFormField>
+                            <UFormField label="Head">
+                              <UInput
+                                v-model="item.head"
+                                :maxlength="60"
+                                :aria-describedby="`grid-head-count-${item.id}`"
+                                :ui="{ trailing: 'pointer-events-none' }"
+                              >
+                                <template #trailing>
+                                  <div :id="`grid-head-count-${item.id}`" class="text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                                    {{ item.head.length }}/60
+                                  </div>
+                                </template>
+                              </UInput>
+                            </UFormField>
+                          </div>
+                          <UFormField label="Body">
+                            <UTextarea v-model="item.body" :rows="2" :maxlength="160" />
+                            <div class="mt-1 text-right text-xs text-muted tabular-nums" aria-live="polite" role="status">
+                              {{ item.body.length }}/160
                             </div>
                           </UFormField>
                         </div>
@@ -358,6 +433,7 @@ type PageComponent =
   | { type: 'jobs'; title: string; description: string }
   | { type: 'socials'; title: string; description: string; socials: Array<{ platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }> }
   | { type: 'images'; title: string; description: string; images: Array<{ imageUrl: string }>; carousel: { itemsPerPage: number; showArrows: boolean; showDots: boolean; autoplay: boolean } }
+  | { type: 'grid'; title: string; description: string; columns: number; rows: number; items: Array<{ icon: string; head: string; body: string }> }
 
 type ImageEditorEntry = { id: string; imageUrl: string }
 
@@ -368,6 +444,18 @@ const socialPlatformItems = [
   { label: 'Discord', value: 'discord' },
   { label: 'Email', value: 'email' },
 ] as const
+const gridIconSuggestions = [
+  'i-lucide-star',
+  'i-lucide-rocket',
+  'i-lucide-shield',
+  'i-lucide-zap',
+  'i-lucide-sparkles',
+  'i-lucide-badge-check',
+  'i-lucide-circle-help',
+  'i-lucide-code-2',
+  'i-lucide-briefcase',
+  'i-lucide-users'
+]
 
 const apiBase = 'http://127.0.0.1:3001'
 const isModalOpen = ref(false)
@@ -379,20 +467,25 @@ const isLinkCopied = ref(false)
 const toast = useToast()
 // Small timer to flip the copy button back after a short success state.
 let copyResetTimer: ReturnType<typeof setTimeout> | undefined
-const heroTitle = ref('Hero')
-const heroDescription = ref('Build your next application with a clean, modern landing page.')
+const heroTitle = ref('')
+const heroDescription = ref('')
 const heroBannerUrl = ref('')
-const jobsTitle = ref('Jobs')
-const jobsDescription = ref('Find your next role in our open positions.')
-const socialsTitle = ref('Socials')
-const socialsDescription = ref('Folge uns auf YouTube.')
-const imagesTitle = ref('Images')
-const imagesDescription = ref('Ein paar Eindrücke aus dem Team.')
+const jobsTitle = ref('')
+const jobsDescription = ref('')
+const socialsTitle = ref('')
+const socialsDescription = ref('')
+const imagesTitle = ref('')
+const imagesDescription = ref('')
 const imageEntries = ref<ImageEditorEntry[]>([])
 const imageItemsPerPage = ref(3)
 const imageShowArrows = ref(true)
 const imageShowDots = ref(true)
 const imageAutoplay = ref(false)
+const gridTitle = ref('')
+const gridDescription = ref('')
+const gridColumns = ref(2)
+const gridRows = ref(1)
+const gridItems = ref<Array<{ id: string; icon: string; head: string; body: string }>>([])
 const socialEntries = ref<Array<{ id: string; platform: 'youtube' | 'instagram' | 'tiktok' | 'discord' | 'email'; handle: string; visible: boolean }>>([
   { id: 'social-1', platform: 'youtube', handle: 'galaxybot', visible: true },
   { id: 'social-2', platform: 'tiktok', handle: 'galaxybot', visible: true },
@@ -461,6 +554,26 @@ const pageSchema = z.object({
         showDots: z.boolean(),
         autoplay: z.boolean()
       })
+    }),
+    z.object({
+      type: z.literal('grid'),
+      title: z.string().trim().min(1).max(30),
+      description: z.string().trim().min(1).max(100),
+      columns: z.number().int().min(2).max(4),
+      rows: z.number().int().min(1).max(3),
+      items: z.array(z.object({
+        icon: z.string().trim().min(1),
+        head: z.string().trim().min(1).max(60),
+        body: z.string().trim().min(1).max(160)
+      })).max(12)
+    }).superRefine((grid, ctx) => {
+      if (grid.items.length !== grid.columns * grid.rows) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['items'],
+          message: 'Grid-Inhalte müssen zu Spalten x Reihen passen.'
+        })
+      }
     })
   ])).min(2)
 })
@@ -501,6 +614,12 @@ const addableComponentItems = computed(() => {
       title: 'Images',
       description: 'Bild-Carousel mit optionalen Ziel-Links.',
       disabled: usedTypes.has('images')
+    },
+    {
+      type: 'grid' as const,
+      title: 'Grid',
+      description: 'Mehrspaltiges Inhaltsraster.',
+      disabled: usedTypes.has('grid')
     }
   ].sort((a, b) => Number(a.disabled) - Number(b.disabled))
 })
@@ -508,11 +627,12 @@ const addableComponentItems = computed(() => {
 const previewComponents = computed<PageComponent[]>(() => {
   return components.value.map(component => ({
     ...component,
-    title: component.type === 'hero' ? heroTitle.value : component.type === 'jobs' ? jobsTitle.value : socialsTitle.value,
-    description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : socialsDescription.value,
+    title: component.type === 'hero' ? heroTitle.value : component.type === 'jobs' ? jobsTitle.value : component.type === 'socials' ? socialsTitle.value : component.type === 'images' ? imagesTitle.value : gridTitle.value,
+    description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : component.type === 'socials' ? socialsDescription.value : component.type === 'images' ? imagesDescription.value : gridDescription.value,
     ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {}),
     ...(component.type === 'socials' ? { socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible })) } : {}),
-    ...(component.type === 'images' ? { title: imagesTitle.value, description: imagesDescription.value, images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })), carousel: { itemsPerPage: imageItemsPerPage.value, showArrows: imageShowArrows.value, showDots: imageShowDots.value, autoplay: imageAutoplay.value } } : {})
+    ...(component.type === 'images' ? { title: imagesTitle.value, description: imagesDescription.value, images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })), carousel: { itemsPerPage: imageItemsPerPage.value, showArrows: imageShowArrows.value, showDots: imageShowDots.value, autoplay: imageAutoplay.value } } : {}),
+    ...(component.type === 'grid' ? { title: gridTitle.value, description: gridDescription.value, columns: gridColumns.value, rows: gridRows.value, items: gridItems.value.map(({ icon, head, body }) => ({ icon, head, body })) } : {})
   })) as PageComponent[]
 })
 
@@ -542,36 +662,44 @@ function addSocialComponent() {
     return
   }
 
+  socialsTitle.value = ''
+  socialsDescription.value = ''
+  socialEntries.value = []
   components.value.push({
     type: 'socials',
-    title: socialsTitle.value,
-    description: socialsDescription.value,
-    socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible }))
+    title: '',
+    description: '',
+    socials: []
   })
   addSlideoverOpen.value = false
 }
 
-function addComponentByType(type: 'hero' | 'jobs' | 'socials' | 'images') {
+function addComponentByType(type: 'hero' | 'jobs' | 'socials' | 'images' | 'grid') {
   if (components.value.some(component => component.type === type)) {
     return
   }
 
   if (type === 'hero') {
+    heroTitle.value = ''
+    heroDescription.value = ''
+    heroBannerUrl.value = ''
     components.value.push({
       type: 'hero',
-      title: heroTitle.value,
-      description: heroDescription.value,
-      bannerUrl: heroBannerUrl.value
+      title: '',
+      description: '',
+      bannerUrl: ''
     })
     addSlideoverOpen.value = false
     return
   }
 
   if (type === 'jobs') {
+    jobsTitle.value = ''
+    jobsDescription.value = ''
     components.value.push({
       type: 'jobs',
-      title: jobsTitle.value,
-      description: jobsDescription.value
+      title: '',
+      description: ''
     })
     addSlideoverOpen.value = false
     return
@@ -582,11 +710,36 @@ function addComponentByType(type: 'hero' | 'jobs' | 'socials' | 'images') {
     return
   }
 
+  if (type === 'grid') {
+    gridTitle.value = ''
+    gridDescription.value = ''
+    gridColumns.value = 2
+    gridRows.value = 1
+    gridItems.value = []
+    syncGridItems()
+    components.value.push({
+      type: 'grid',
+      title: '',
+      description: '',
+      columns: gridColumns.value,
+      rows: gridRows.value,
+      items: gridItems.value.map(({ icon, head, body }) => ({ icon, head, body }))
+    })
+    addSlideoverOpen.value = false
+    return
+  }
+  imagesTitle.value = ''
+  imagesDescription.value = ''
+  imageEntries.value = []
+  imageItemsPerPage.value = 3
+  imageShowArrows.value = true
+  imageShowDots.value = true
+  imageAutoplay.value = false
   components.value.push({
     type: 'images',
-    title: imagesTitle.value,
-    description: imagesDescription.value,
-    images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })),
+    title: '',
+    description: '',
+    images: [],
     carousel: {
       itemsPerPage: imageItemsPerPage.value,
       showArrows: imageShowArrows.value,
@@ -595,6 +748,17 @@ function addComponentByType(type: 'hero' | 'jobs' | 'socials' | 'images') {
     }
   })
   addSlideoverOpen.value = false
+}
+
+function syncGridItems() {
+  const needed = gridColumns.value * gridRows.value
+  if (gridItems.value.length < needed) {
+    for (let i = gridItems.value.length; i < needed; i++) {
+      gridItems.value.push({ id: `grid-${crypto.randomUUID()}`, icon: '', head: '', body: '' })
+    }
+  } else if (gridItems.value.length > needed) {
+    gridItems.value = gridItems.value.slice(0, needed)
+  }
 }
 
 function addImageEntry() {
@@ -611,20 +775,12 @@ function addSocialEntry(platform: 'youtube' | 'instagram' | 'tiktok' | 'discord'
     return
   }
 
-  const defaults: Record<typeof platform, string> = {
-    youtube: 'galaxybot',
-    instagram: 'galaxybot',
-    tiktok: 'galaxybot',
-    discord: 'discord.gg/galaxybot',
-    email: 'hello@galaxybot.com'
-  }
-
   socialEntries.value = [
     ...socialEntries.value,
     {
       id: `social-${crypto.randomUUID()}`,
       platform,
-      handle: defaults[platform],
+      handle: '',
       visible: true
     }
   ]
@@ -720,15 +876,16 @@ async function loadPage() {
     const jobs = parsed.components.find(component => component.type === 'jobs')
     const socials = parsed.components.find(component => component.type === 'socials')
     const images = parsed.components.find(component => component.type === 'images')
-    heroTitle.value = hero?.title || 'Hero'
+    const grid = parsed.components.find(component => component.type === 'grid')
+    heroTitle.value = hero?.title || ''
     heroDescription.value = hero?.description || ''
     heroBannerUrl.value = hero?.bannerUrl || ''
-    jobsTitle.value = jobs?.title || 'Jobs'
+    jobsTitle.value = jobs?.title || ''
     jobsDescription.value = jobs?.description || ''
-    socialsTitle.value = socials?.title || 'Socials'
-    socialsDescription.value = socials?.description || 'Folge uns auf YouTube.'
-    imagesTitle.value = images?.title || 'Images'
-    imagesDescription.value = images?.description || 'Ein paar Eindrücke aus dem Team.'
+    socialsTitle.value = socials?.title || ''
+    socialsDescription.value = socials?.description || ''
+    imagesTitle.value = images?.title || ''
+    imagesDescription.value = images?.description || ''
     imageEntries.value = images?.images.map((image, index) => ({
       id: `image-${index + 1}`,
       imageUrl: image.imageUrl
@@ -737,15 +894,18 @@ async function loadPage() {
     imageShowArrows.value = images?.carousel.showArrows ?? true
     imageShowDots.value = images?.carousel.showDots ?? true
     imageAutoplay.value = images?.carousel.autoplay ?? false
+    gridTitle.value = grid?.title ?? ''
+    gridDescription.value = grid?.description ?? ''
+    gridColumns.value = grid?.columns ?? 2
+    gridRows.value = grid?.rows ?? 1
+    gridItems.value = grid?.items.map((item, index) => ({ id: `grid-${index + 1}`, icon: item.icon, head: item.head, body: item.body })) ?? []
     socialEntries.value = socials?.socials.map((social, index) => ({
       id: `social-${index + 1}`,
       platform: social.platform,
       handle: social.handle,
       visible: social.visible
     })) ?? [
-      { id: 'social-1', platform: 'youtube', handle: 'galaxybotapp', visible: true },
-      { id: 'social-2', platform: 'tiktok', handle: 'galaxybot', visible: true },
-      { id: 'social-3', platform: 'discord', handle: 'discord.gg/galaxybot', visible: true }
+      { id: 'social-1', platform: 'youtube', handle: '', visible: true }
     ]
     savedSnapshot.value = JSON.stringify({
       components: parsed.components,
@@ -763,7 +923,12 @@ async function loadPage() {
       imageItemsPerPage: imageItemsPerPage.value,
       imageShowArrows: imageShowArrows.value,
       imageShowDots: imageShowDots.value,
-      imageAutoplay: imageAutoplay.value
+      imageAutoplay: imageAutoplay.value,
+      gridTitle: gridTitle.value,
+      gridDescription: gridDescription.value,
+      gridColumns: gridColumns.value,
+      gridRows: gridRows.value,
+      gridItems: gridItems.value
     })
     // This is the value for the unsaved-changes check.
     hasUnsavedChanges.value = false
@@ -788,7 +953,8 @@ async function savePage() {
         description: component.type === 'hero' ? heroDescription.value : component.type === 'jobs' ? jobsDescription.value : socialsDescription.value,
         ...(component.type === 'hero' ? { bannerUrl: heroBannerUrl.value } : {}),
         ...(component.type === 'socials' ? { socials: socialEntries.value.map(({ platform, handle, visible }) => ({ platform, handle, visible })) } : {}),
-        ...(component.type === 'images' ? { title: imagesTitle.value, description: imagesDescription.value, images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })), carousel: { itemsPerPage: imageItemsPerPage.value, showArrows: imageShowArrows.value, showDots: imageShowDots.value, autoplay: imageAutoplay.value } } : {})
+        ...(component.type === 'images' ? { title: imagesTitle.value, description: imagesDescription.value, images: imageEntries.value.map(({ imageUrl }) => ({ imageUrl })), carousel: { itemsPerPage: imageItemsPerPage.value, showArrows: imageShowArrows.value, showDots: imageShowDots.value, autoplay: imageAutoplay.value } } : {}),
+        ...(component.type === 'grid' ? { title: gridTitle.value, description: gridDescription.value, columns: gridColumns.value, rows: gridRows.value, items: gridItems.value.map(({ icon, head, body }) => ({ icon, head, body })) } : {})
       }))
     }
 
@@ -816,7 +982,12 @@ async function savePage() {
       imageItemsPerPage: imageItemsPerPage.value,
       imageShowArrows: imageShowArrows.value,
       imageShowDots: imageShowDots.value,
-      imageAutoplay: imageAutoplay.value
+      imageAutoplay: imageAutoplay.value,
+      gridTitle: gridTitle.value,
+      gridDescription: gridDescription.value,
+      gridColumns: gridColumns.value,
+      gridRows: gridRows.value,
+      gridItems: gridItems.value
     })
     isModalOpen.value = false
     toast.add({
@@ -849,7 +1020,7 @@ function discardAndClose() {
 }
 
 watch(
-  [components, heroTitle, heroDescription, heroBannerUrl, jobsTitle, jobsDescription, socialsTitle, socialsDescription, socialEntries, imagesTitle, imagesDescription, imageEntries, imageItemsPerPage, imageShowArrows, imageShowDots, imageAutoplay],
+  [components, heroTitle, heroDescription, heroBannerUrl, jobsTitle, jobsDescription, socialsTitle, socialsDescription, socialEntries, imagesTitle, imagesDescription, imageEntries, imageItemsPerPage, imageShowArrows, imageShowDots, imageAutoplay, gridTitle, gridDescription, gridColumns, gridRows, gridItems],
   () => {
     // Compare the current form with the last saved snapshot.
     hasUnsavedChanges.value = JSON.stringify({
@@ -868,11 +1039,20 @@ watch(
       imageItemsPerPage: imageItemsPerPage.value,
       imageShowArrows: imageShowArrows.value,
       imageShowDots: imageShowDots.value,
-      imageAutoplay: imageAutoplay.value
+      imageAutoplay: imageAutoplay.value,
+      gridTitle: gridTitle.value,
+      gridDescription: gridDescription.value,
+      gridColumns: gridColumns.value,
+      gridRows: gridRows.value,
+      gridItems: gridItems.value
     }) !== savedSnapshot.value
   },
   { deep: true }
 )
+
+watch([gridColumns, gridRows], () => {
+  syncGridItems()
+})
 
 onMounted(() => {
   void loadPage()
