@@ -21,12 +21,11 @@ app.get('/api/application-settings', async () => {
     throw new Error('Application settings not initialized')
   }
 
-  // The page settings are stored as JSON text, so we parse and validate them here.
+  // parse and validate
   return pageSettingsSchema.parse(JSON.parse(settings.pageSettings))
 })
 
 app.put('/api/application-settings', async (request) => {
-  // Keep the endpoint strict: only save data that matches the page schema.
   const body = pageSettingsSchema.parse(request.body)
 
   const [settings] = await ApplicationSettings.findOrCreate({
